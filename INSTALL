@@ -1,0 +1,87 @@
+INSTALL:
+========
+
+
+Table of contents:
+==================
+
+    * Minimum Requirements for compile
+    * Installation from sources
+        - Basic build command
+        - Advanced build command
+
+
+Minimum Requirements for compile
+================================
+
+ To compile the PuMA software on a Linux/Unix machine you must have the following:
+
+ *Required Hardware and Software Packages:
+   o The machine must be on a 64-bit operating system.
+   o The machine needs over 16G of memory per PuMA job.
+   o Perl 5 
+   o xvfb-run (part of X11)
+   o Cutadapt (https://cutadapt.readthedocs.org/en/stable)
+   o Bowtie2 (https://sourceforge.net/projects/bowtie-bio)
+   o Diamond (https://github.com/bbuchfink/diamond)
+   o MEGAN (http://ab.inf.uni-tuebingen.de/software/megan5)
+
+
+ *Required Perl Modules:
+   o FindBin
+   o Cwd
+   o Carp
+   o Getopt::Std
+   o File::Copy
+   o File::Basename
+   o Benchmark
+   o Config::Tiny
+
+ *Optional Software Packages Used:
+
+
+BASIC Installation from sources
+===============================
+ Basic installation will build the paths and configurations directory located in the top level PuMA folder.
+ Installation will generate an example.conf file that will be stored under the "conf" directory.
+
+ o Linux / Solaris / Mac OSX: To compile the PuMA you simply need to type:
+   	
+	$ tar xzvf PuMA_<version>.<revision>.tar.gz
+	$ cd PuMA_<version>.<revision>
+	$ ./configure
+	$ make
+	
+	Now you will need to edit the example configuration file located under the PuMA conf directory and 
+	add the information about databases and other files needed. These options can be included when doing
+	the Full Installation below. 
+
+    o Example:
+	$ tar xzvf PuMA_1.1.tar.gz
+	$ cd PuMA_1.1
+	$ ./configure
+	$ make
+
+
+
+Full Installation from sources
+===============================
+ Full installation will build the paths and configurations directory located in the top level PuMA folder.
+ Installation will generate an example.conf file that will be stored under the "conf" directory.
+
+ o Linux / Solaris / Mac OSX: To compile the PuMA you simply need to type:
+   	
+	$ tar xzvf PuMA_<version>.<revision>.tar.gz
+	$ cd PuMA_<version>.<revision>
+	$ ./configure --with-bowtie2db=<bowtie2 db path> --with-diamonddb=<diamond db path> --with-meganlicense=<megan license file> --with-taxGIFile=<path to taxGI file> --with-seedGIFile=<path to seedGI file> --with-keggGIFile=<path to keggGI file>
+	$ make
+
+    o Example:
+	$ tar xzvf PuMA_1.1.tar.gz
+	$ cd PuMA_1.1
+	$ ./configure --with-bowtie2db=/data/db/hg19.bt2 --with-diamonddb=/data/db/diamond.dmnd --with-meganlicense=/data/megan/MEGAN5-academic-license.txt --with-taxGIFile=/data/db/gi_taxid.bin --with-seedGIFile=/data/db/gi_seed.bin --with-keggGIFile=/data/db/gi_kegg.bin
+	$ make
+
+
+End
+===

@@ -1,0 +1,58 @@
+AC_INIT(configure.in)
+AC_CHECK_PROGS(CP, cp, "")
+AC_CHECK_PROGS(MKDIR, mkdir, "")
+
+AC_CHECK_PROG(XVFBRUN,xvfb-run,yes)
+if test x"$XVFBRUN" != x"yes" ; then
+    AC_MSG_ERROR([Please install xvfb-run before continuing.])
+fi
+
+
+AC_CHECK_PROG(CUTADAPT,cutadapt,yes)
+if test x"$CUTADAPT" != x"yes" ; then
+    AC_MSG_ERROR([Please install cutadapt before continuing.])
+else
+	CUTADAPT=`which cutadapt`
+fi
+
+AC_CHECK_PROG(BOWTIE2,bowtie2,yes)
+if test x"$BOWTIE2" != x"yes" ; then
+    AC_MSG_ERROR([Please install bowtie2 before continuing.])
+else
+	BOWTIE2=`which bowtie2`
+fi
+
+AC_CHECK_PROG(DIAMOND,diamond,yes)
+if test x"$DIAMOND" != x"yes" ; then
+    AC_MSG_ERROR([Please install diamond before continuing.])
+else
+	DIAMOND=`which diamond`
+fi
+
+AC_CHECK_PROG(MEGANPRG,MEGAN,yes)
+if test x"$MEGANPRG" != x"yes" ; then
+    AC_MSG_ERROR([Please install MEGAN before continuing.])
+else
+	MEGANPRG=`which MEGAN`
+fi
+
+
+
+AC_ARG_WITH(bowtie2db,[  --with-bowtie2db=<path> path to bowtie2 database], BT2DB="$withval")
+AC_ARG_WITH(diamonddb,[  --with-diamonddb=<path> path to diamond database], DIADB="$withval")
+AC_ARG_WITH(meganlicense,[  --with-meganlicense=<path> path to megan License File], MEGLIC="$withval")
+AC_ARG_WITH(taxGIFile,[  --with-taxGIFile=<path> path to taxGIFile], TGIF="$withval")
+AC_ARG_WITH(seedGIFile,[  --with-seedGIFile=<path> path to seedGIFile], SGIF="$withval")
+AC_ARG_WITH(keggGIFile,[  --with-keggGIFile=<path> path to keggGIFile], KGIF="$withval")
+
+AC_SUBST(CUTADAPT)
+AC_SUBST(BOWTIE2)
+AC_SUBST(MEGANPRG)
+AC_SUBST(DIAMOND)
+AC_SUBST(BT2DB)
+AC_SUBST(DIADB)
+AC_SUBST(MEGLIC)
+AC_SUBST(TGIF)
+AC_SUBST(SGIF)
+AC_SUBST(KGIF)
+AC_OUTPUT(Makefile)
