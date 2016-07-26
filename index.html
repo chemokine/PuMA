@@ -1,0 +1,451 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>PuMA by chemokine</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>PuMA</h1>
+        <p>Processing untility for Metagenomics Analysis (PuMA)</p>
+        <p class="view"><a href="https://github.com/chemokine/PuMA">View the Project on GitHub <small>chemokine/PuMA</small></a></p>
+        <ul>
+          <li><a href="https://github.com/chemokine/PuMA/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/chemokine/PuMA/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/chemokine/PuMA">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Documentation:</h1>
+
+<h1>
+<a id="table-of-contents" class="anchor" href="#table-of-contents" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Table of contents:</h1>
+
+<pre><code> I. What is PuMA
+II. Installation of PuMA
+* See the INSTALL file
+</code></pre>
+
+<p>III. PUMA Processing with Alignment
+    * Creating a configuration file
+    * Processing a new fastq file of data (puma.pl)
+    * Rerun a stopped or failed run
+    IV. PUMA Processing Tools
+    * Parse the FASTQ input file using Cutadapt (run_cutadapt.pl)
+    * Align data using bowtie2 (run_bowtie2.pl)
+    * Convert fastq to fasta file format (fastq2fasta.pl)
+    * Align data using Diamond (run_diamond.pl)
+    * Process data through MEGAN5 (run_megan.pl)
+    * Convert output format (convert_output.pl)
+    V. PUMA Combine Runs (After Processing)
+    * Combine multiple runs of output into one file (combine.pl)</p>
+
+<h1>
+<a id="i-what-is-puma" class="anchor" href="#i-what-is-puma" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>I. What is PuMA</h1>
+
+<pre><code>* Processing untility for Metagenomics Analysis (PuMA)
+  --------------------
+</code></pre>
+
+<h1>
+<a id="ii-installation-of-puma" class="anchor" href="#ii-installation-of-puma" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>II. Installation of PuMA</h1>
+
+<pre><code>* See the INSTALL file
+  --------------------
+</code></pre>
+
+<h1>
+<a id="iii-puma-processing-with-alignment" class="anchor" href="#iii-puma-processing-with-alignment" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>III. PUMA Processing with Alignment</h1>
+
+<pre><code>* Creating a configuration file
+  -----------------------------
+    There is an example configuration file located in the "conf"
+    directory of the installation path. This file is broken down
+    into different stanzas, at the top is the [PuMA] stanza to handle the
+    base tools, options and paths. There are cpu/memory option that
+    will handle the usage for each step of the pipeline in separate stanzas 
+    individually. This allows you to speed up individual steps as needed. 
+    It is important that a fully qualified path to your tools and databases.
+    compiled PuMA genome is provided.
+
+    Cutadapt Stanza:
+      Users have the ablitiy to adjust the standard cudadapt options
+      using the "cutadapt_options" variable. We have provided a set
+      of options that will work for most general runs. 
+
+    Bowtie2 Stanza:
+      Users have the ablitiy to adjust the standard bowtie2 options
+      using the "bowtie2_options" variable. We have provided a set
+      of options that will work for most general runs. The bowtie2
+      database path (including index name) used to filter reads from
+      the base genome needs to be provided in "bowtie2_db".
+      Pre-made bowtie2 databases can be found at the following address
+      http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+
+    Diamon Stanza:
+      PuMA uses diamond to map reads to protein sequences in a reference
+      database (usually NCBI nr database). http://ab.inf.uni-tuebingen.de/software/diamond/
+
+      Users have the ablitiy to adjust the standard diamond options
+      using the "diamond_options" variable. We have provided a set
+      of options that will work for most general runs.
+
+      To run PuMA with diamond, the user needs to format their reference
+      protein sequence file (fasta format, sequence name should contain NCBI GI
+      number) to diamond search database (*.dmnd). The diamond database
+      path (including file name) needs to be provided in "bowtie2_db".
+
+      Example Command To Build Diamond Database:
+         diamond makedb --in nr.faa -d nr.dmnd
+
+    MEGAN Stanza:
+      PuMA uses MEGAN5 for assigning reads to taxonomy and function (kegg,seed),
+      users need to download gi-taxa id and gi-function id (e.g. kegg, seed)
+      mapping files from MEGAN5 website (http://ab.inf.uni-tuebingen.de/data/software/megan5/download/welcome.html).
+      Once you have downloaded the files you will need to provide the path
+      and filename in the "taxGIFile", "seedGIFile" and "keggGIFile" options.
+
+      Users have the ablitiy to adjust the standard MEGAN options
+      using the "megan_options" variable. We have provided a set
+      of options that will work for most general runs. The MEGAN
+      license path (including file name) needs to be provided
+      in "meganLicense". Finally if you plan to run large datasets
+      through this tool you will want to adjust the JAVA VM
+      options for MEGAN. This can be done by adjusting the settings
+      in the MEGAN.vmoptions file located in the MEGAN installation-dir. 
+      Please follow the MEGAN installation instructions on how to
+      adjust this setting. We suggest using -Xmx8G setting as a
+      minimum.
+
+
+
+      Genome/Run setup stanza with explanation:
+
+        [PuMA]
+        cp                      = cp
+        rm                      = rm
+        mkdir                   = mkdir
+        xvfbrun                 = xvfb-run
+        fastq2fasta             = pipeline/fastq2fasta.pl
+        convert_output          = pipeline/convert_output.pl
+        run_cutadapt            = pipeline/run_cutadapt.pl
+        run_bowtie2             = pipeline/run_bowtie2.pl
+        run_diamond             = pipeline/run_diamond.pl
+        run_megan               = pipeline/run_megan.pl
+
+        [Cutadapt]
+        cutadapt                = cutadapt
+        cutadapt_options        = -e 0.2 -O 5 -m 60
+
+        [Bowtie2]
+        bowtie2                 = bowtie2
+        bowtie2_db              = hg19-bt2
+        bowtie2_options         = -p 1
+
+        [Diamond]
+        diamond                 = diamond
+        diamond_db              = diamond.dmnd
+        diamond_options         = -p 1
+
+        [MEGAN]
+        megan                   = MEGAN
+        megan_options           = -MC 1
+        meganLicense            = MEGAN5-academic-license.txt
+        taxGIFile               = gi_taxid.bin
+        seedGIFile              = gi_seed.bin
+        keggGIFile              = gi_kegg.bin
+
+
+
+
+
+* Processing a new fastq data (puma.pl)
+  -----------------------------------------------------
+
+            Program:
+            puma.pl
+
+            Description:
+        puma.pl is the main controller script for the entire PUMA
+    Pipeline. It is used to call all other tools within the PUMA software
+    package. This tool requires a complete installation of the PUMA
+    Pipeline. 
+
+    The puma.pl pipeline can process multiple files at one time by
+    providing a list of files separated by a semi-colon or using regular
+    expressions of numbers like [1-7] or a combination of both. This
+    allows the pipeline to be used to process a single file per machine or
+    multiple files per machine by using this option. For each file
+    listed in the -f option a process will be started at the same time.
+    By default each step of the pipeline uses a single processor but that
+    can be adjusted in the configuration file stanzas for each step.
+
+    The pipeline uses an adaptors file input file that can contain a list
+    of adaptors that you would like to use with the program cutadapt.
+
+    The pipeline configuration file is used to manage all the resources and
+    paths for each run. After the PuMA pipeline is installed and example
+    configuration file will be provided under the pipeline conf directory.
+    Users can make as many configuration files as needed using the example
+    as a base. Simply use the the correct configuration file for each run.
+
+    Since the PuMA pipeline creates lots of intermediate files that can consume
+    space. The pipeline is set to remove these files at the end of each completed
+    run. If you would like to keep these file please use the debug option.
+
+
+
+        puma.pl -f &lt;data_files&gt; -a &lt;adapters&gt; -c &lt;configuration_file&gt; -d
+
+
+        -f   The Datafile(s) containing your sequence data. For Example:
+               -f 's_1_sequences.fastq'
+               -f 's_[1-7]_sequences.fastq'
+               -f 's_[1-4]_sequences.fastq;s_[6-7]_sequences.fastq'
+        -a   Input file of adaptor sequences (one per line).
+               -a adaptors.txt
+
+        -c   The run configuration file (default = conf/example.conf).
+               -c example.conf
+
+        -r   The run directory for rerunning a failed run. When using
+         this do not use any other options
+           Example:
+                   puma.pl -r s_1_sequences.fastq.10001.dir
+
+        -d   Debug mode: Keep all intermediate files.
+
+
+
+
+* Processing a new fastq data (puma.pl)
+  -----------------------------------------------------
+
+    If a runs stops prematurally the there is an option to point
+    the puma pipeline at the failed run folder and have it try and restart from
+    where it left off. When using the -r option please provide the folder run name
+    and no other options. This optios may not always work since it depends on how
+    the pipeline was killed or failed. This method reads through the run_info.log
+    file to find the steps that are "Done". If the rerun is not working you can
+    try and remove some of the "Done" entries and see if it picks up where you
+    need.
+</code></pre>
+
+<h1>
+<a id="iv-puma-processing-tools" class="anchor" href="#iv-puma-processing-tools" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>IV. PUMA Processing Tools</h1>
+
+<pre><code>* Processing fastq files with Cutadapt (Step 1 of pipeline)
+  -----------------------------------------------------
+
+            Program:
+            run_cutadapt.pl
+
+    Description:
+    Runs the Cutadapt and processes the input file given by the -f option and processess it through cutadapt
+
+    Usage:
+    run_cutadapt.pl -f &lt;inputfile&gt; -a &lt;adaptors&gt; -l &lt;logfile&gt; -r &lt;run_id&gt; -c &lt;config_file&gt;
+
+    -f   The input fastq file:
+
+    -a   Input file of adaptor sequences (one per line).
+
+    -l   The logfile name:
+
+    -r   The RunID for the pipeline:
+
+    -c   The run configuration file (default = example.conf):
+
+
+
+
+
+
+
+* Processing Cutadapt output with Bowtie2 (Step 2 of pipeline)
+  -----------------------------------------------------
+
+            Program:
+            run_bowtie2.pl
+
+    Description:
+    Run Bowtie2 on all cutadapt output files. This tool will process input files given by
+    the -f option and processess it through bowtie2
+
+    Usage:
+    run_bowtie2.pl -f &lt;inputfile&gt; -l &lt;logfile&gt; -r &lt;run_id&gt; -c &lt;config_file&gt;
+
+    -f   The input fastq file:
+
+    -l   The logfile name:
+
+    -r   The RunID for the pipeline:
+
+    -c   The run configuration file (default = example.conf):
+
+
+
+
+
+
+
+
+* Processing Bowtie output files converting fastq to fasta (Step 3 of pipeline)
+  -----------------------------------------------------
+
+
+            Program:
+            fastq2fasta.pl
+
+    Description:
+
+    Usage:
+    fastq2fasta.pl -f &lt;input_fastq&gt; -o &lt;outfile_fasta&gt; -l &lt;logfile&gt;
+
+    -f   Input data file in FASTQ format.
+
+    -o   Outfile FASTA file name.
+
+    -l   The logfile name:
+
+
+
+
+
+
+
+* Processing fasta files through Diamond (Step 4 of pipeline)
+  -----------------------------------------------------
+
+            Program:
+            run_diamond.pl
+
+    Description:
+    Run Diamond on bowtie2 output files. This tool will processes the input file given by the -f option and processess it through diamond
+
+    Usage:
+    run_diamond.pl -f &lt;inputfile&gt; -l &lt;logfile&gt; -r &lt;run_id&gt; -c &lt;config_file&gt;
+
+    -f   The input fasta file:
+
+    -l   The logfile name:
+
+    -r   The RunID for the pipeline:
+
+    -c   The run configuration file (default = example.conf):
+
+
+
+
+
+
+
+
+
+* Processing Diamond output files using MEGAN5 (Step 5 of pipeline)
+  -----------------------------------------------------
+
+            Program:
+            run_megan.pl
+
+    Description:
+    Run MEGAN5 on diamond output files. This tool will processes the input file given by the -f option and processess it through diamond
+
+    Usage:
+    run_megan.pl -f &lt;inputfile&gt; -l &lt;logfile&gt; -r &lt;run_id&gt; -c &lt;config_file&gt;
+
+    -f   The input fasta file:
+
+    -l   The logfile name:
+
+    -r   The RunID for the pipeline:
+
+    -c   The run configuration file (default = conf/example.conf):
+
+
+
+
+
+
+
+
+* Processing MEGAN5 output and converting it to tab format (Step 6 of pipeline)
+  -----------------------------------------------------
+
+            Program:
+            convert_output.pl
+
+    Description:
+
+    Usage:
+    convert_output.pl -r &lt;run_directory&gt; -o &lt;output_file&gt; -l &lt;logfile&gt;
+
+    -r   PuMA Pipeline Run directory.
+
+    -o   Output file name.
+
+    -l   The logfile name:
+</code></pre>
+
+<h1>
+<a id="v-puma-combine-runs-after-processing" class="anchor" href="#v-puma-combine-runs-after-processing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>V. PUMA Combine Runs (After Processing)</h1>
+
+<pre><code>* Processing PuMA output directories and combine output files
+  -----------------------------------------------------
+
+            Program:
+            combine.pl
+
+    Description:
+    This tool is used to combine the all_counts.tsv from multiple
+    runs into a two files with different formats. The first file is a
+    concatination of the all_counts.tsv but maintains the same format
+    (long). The second file format is a wide format putting each
+    sample in a column.
+
+    The combine.pl pipeline can process multiple run directories at one time by
+    providing a list of directories separated by a semi-colon or using regular
+    expressions of numbers like [1-7] or a combination of both. This
+    allows the combine tool to be used to process a single directory per machine or
+    multiple directories per machine by using this option. For each directory
+    listed in the -d option a process will be started one after another.
+
+    Usage:
+    combine.pl -d &lt;puma run directories&gt; -o &lt;output file name&gt;
+
+    -d   The Run Directories containing your PuMA Pipeline data.
+
+        For Example:
+            -d 'C1_data.fq'
+            -d 'C[1-2]_data.fq'
+            -d 'C[1-4]_data.fq;C[6-7]_data.fq'
+
+    -o   Output identifier
+            For Example:
+            -o 'all_samples'
+</code></pre>
+
+<h1>
+<a id="end-of-document" class="anchor" href="#end-of-document" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>END of Document</h1>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/chemokine">chemokine</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
