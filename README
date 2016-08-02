@@ -1,4 +1,10 @@
 PuMA README
+This software takes illumina fastq files as input and generates bacteria species, KEGG function and SEED function abundance table as output.
+The workflow includes 
+    1.Reads quality control, adaptor trimming.
+    2.Remove host reads if the sample contains host sequences.
+    3.Uses DIAMOND aligner to map reads to reference protein database.
+    4.Uses MEGAN5 command line workflow to generate taxa/function abundance table. 
 ================
 
  Copyright 2016
